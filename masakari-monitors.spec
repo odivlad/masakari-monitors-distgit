@@ -2,7 +2,7 @@
 
 
 %global package_name masakari-monitors
-%global srcname %package_name
+%global confdir etc/masakarimonitors
 
 %define debug_package %{nil}
 
@@ -77,27 +77,28 @@ rm -f *requirements.txt
 
 %build
 %py2_build
+%{__python2} setup.py build_sphinx
 
 
 %install
 %py2_install
-%{__python2} setup.py build_sphinx
 
 # Install systemd units in BUILDROOT
-install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/masakari-hostmonitor.service
-install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/masakari-instancemonitor.service
-install -p -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/masakari-instancemonitor.service
+install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/
+install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/
+install -p -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/
 
 # Install configs in _sysconfdir
 mkdir -p %{buildroot}/%{_sysconfdir}/%{package_name}/
-install -p -D -m 644 etc/%{package_name}/hostmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
-install -p -D -m 644 etc/%{package_name}/processmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
-install -p -D -m 644 etc/%{package_name}/proc.list.sample %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{srcname}/hostmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{srcname}/processmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{srcname}/proc.list.sample %{buildroot}%{_sysconfdir}/%{package_name}/
 
 
 %files
 %{_bindir}/*
-%{python2_sitelib}/%{srcname}*
+%{python2_sitelib}/%{srcname}/*
+%{python2_sitelib}/masakari_monitors*egg-info/
 %config(noreplace) %{_sysconfdir}/%{package_name}/*
 %{_unitdir}/*
 
