@@ -15,8 +15,9 @@ License:    ASL 2.0
 URL:        http://docs.openstack.org/developer/masakari
 
 Source0:    https://tarballs.openstack.org/%{package_name}/%{package_name}-%{upstream_version}.tar.gz
-Source1:    masakari-api.service
-Source2:    masakari-engine.service
+Source1:    masakari-hostmonitor.service
+Source2:    masakari-instancemonitor.service
+Source3:    masakari-processmonitor.service
 
 BuildArch:  noarch
 
@@ -83,12 +84,15 @@ rm -f *requirements.txt
 %{__python2} setup.py build_sphinx
 
 # Install systemd units in BUILDROOT
-install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/masakari-api.service
-install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/masakari-engine.service
+install -p -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/masakari-hostmonitor.service
+install -p -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/masakari-instancemonitor.service
+install -p -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/masakari-instancemonitor.service
 
 # Install configs in _sysconfdir
 mkdir -p %{buildroot}/%{_sysconfdir}/%{package_name}/
-install -p -D -m 644 etc/%{package_name}/* %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{package_name}/hostmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{package_name}/processmonitor.conf.sample %{buildroot}%{_sysconfdir}/%{package_name}/
+install -p -D -m 644 etc/%{package_name}/proc.list.sample %{buildroot}%{_sysconfdir}/%{package_name}/
 
 
 %files
@@ -106,7 +110,7 @@ systemctl daemon-reload
 
 %preun
 if [ $1 -eq 0 ]; then # only before removal
-    systemctl stop masakari-api masakari-engine ||:
+    systemctl stop masakari-hostmonitor.service masakari-instancemonitor.service masakari-instancemonitor.service ||:
 fi
 
 
